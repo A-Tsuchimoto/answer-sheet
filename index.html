@@ -117,7 +117,7 @@
     <h1>弁理士試験 回答記録</h1>
     <div class="grid" id="grid"></div>
     <div class="footer">
-      <button class="btn-reset" id="resetBtn">リセット</button>
+      <button class="btn-reset" id="resetBtn">CLEAR</button>
     </div>
   </div>
 
@@ -173,11 +173,9 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
-      if (confirm('回答をリセットしますか？')) {
-        state = LABELS.map(() => ({ answer: null, star: false }));
-        save();
-        render();
-      }
+      state = LABELS.map(() => ({ answer: null, star: false }));
+      save();
+      render();
     });
 
     load();
