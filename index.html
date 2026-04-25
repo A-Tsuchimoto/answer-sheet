@@ -48,8 +48,16 @@
       align-items: center;
       background: #1f2937;
       border-radius: 16px;
-      padding: 0 18px;
+      padding: 8px 18px;
       gap: 10px;
+    }
+
+    .row-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 7px;
     }
 
     .label-col {
@@ -73,11 +81,26 @@
     }
 
     .btns {
-      flex: 1;
       display: flex;
       justify-content: space-around;
       align-items: center;
     }
+
+    .memo {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #2d3748;
+      border-radius: 0;
+      color: #9ca3af;
+      font-size: 12px;
+      padding: 2px 2px;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .memo::placeholder { color: #374151; }
+    .memo:focus { border-bottom-color: #4b5563; color: #d1d5db; }
 
     .btn {
       width: 56px;
@@ -139,7 +162,11 @@
     const LABELS = ['イ', 'ロ', 'ハ', 'ニ', 'ホ'];
     const KEY = 'benpri_answers';
 
-    let state = LABELS.map(() => ({ answer: null, star: false }));
+    let state = LABELS.map(() => ({ answer: null, star: false, memo: '' }));
+
+    function esc(s) {
+      return (s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
 
     function load() {
       try {
@@ -164,16 +191,26 @@
             <span class="kana">(${label})</span>
             <span class="num">${i + 1}</span>
           </div>
-          <div class="btns">
-            <button class="btn btn-maru ${answer === 'maru'  ? 'on' : ''}" data-i="${i}" data-v="maru">○</button>
-            <button class="btn btn-hante ${answer === 'hante' ? 'on' : ''}" data-i="${i}" data-v="hante">？</button>
-            <button class="btn btn-batsu ${answer === 'batsu' ? 'on' : ''}" data-i="${i}" data-v="batsu">×</button>
-            <button class="btn btn-star ${star ? 'on' : ''}" data-i="${i}" data-v="star">★</button>
+          <div class="row-right">
+            <div class="btns">
+              <button class="btn btn-maru ${answer === 'maru'  ? 'on' : ''}" data-i="${i}" data-v="maru">○</button>
+              <button class="btn btn-hante ${answer === 'hante' ? 'on' : ''}" data-i="${i}" data-v="hante">？</button>
+              <button class="btn btn-batsu ${answer === 'batsu' ? 'on' : ''}" data-i="${i}" data-v="batsu">×</button>
+              <button class="btn btn-star ${star ? 'on' : ''}" data-i="${i}" data-v="star">★</button>
+            </div>
+            <input class="memo" type="text" data-i="${i}" placeholder="メモ" maxlength="30" value="${esc(state[i].memo)}">
           </div>
         `;
         grid.appendChild(row);
       });
     }
+
+    document.getElementById('grid').addEventListener('input', e => {
+      const input = e.target.closest('.memo');
+      if (!input) return;
+      state[+input.dataset.i].memo = input.value;
+      save();
+    });
 
     document.getElementById('grid').addEventListener('click', e => {
       const btn = e.target.closest('[data-v]');
@@ -190,7 +227,7 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
-      state = LABELS.map(() => ({ answer: null, star: false }));
+      state = LABELS.map(() => ({ answer: null, star: false, memo: '' }));
       save();
       render();
     });
